@@ -9,13 +9,22 @@ from lib.rides_data import *
 import pandas as pd
 
 
-def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, debug: bool = False) -> pd.DataFrame:
+def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, debug: bool = True) -> pd.DataFrame:
     """Assigns rider to drivers in the returned dataframe, and updates driver timestamp for the last time they drove.
 
     PRECONDITION: add_temporaries must have been called on drivers_df.
     """
     riders_df.sort_values(by=RIDER_LOCATION_KEY, inplace=True, key=lambda col: col.apply(lambda loc: loc_map.get(loc, loc_map[ELSEWHERE])))
     out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_KEY, OUTPUT_DRIVER_PHONE_KEY, OUTPUT_DRIVER_CAPACITY_KEY]), riders_df[[RIDER_NAME_KEY, RIDER_PHONE_KEY, RIDER_LOCATION_KEY, RIDER_NOTES_KEY]]], axis='columns')
+
+    print("riders_df")
+    print(riders_df)
+
+    print("drivers_df")
+    print(drivers_df)
+
+    print('Out')
+    print(out)
 
     if debug:
         print('Drivers')
@@ -77,12 +86,15 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, debug: bool = Fals
                 is_matched = True
                 break
 
+    print("out return val")
+    print(out)
+
     return out
 
 
 def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, debug: bool) -> pd.DataFrame:
     drivers = prep.prep_necessary_drivers(drivers_df, len(riders_df))
-    out = assign(drivers, riders_df, debug)
+    out = assign(drivers, riders_df, True) # FIXME: temp debug
     post.alert_skipped_riders(out, debug)
     post.clean_output(out)
     if debug:

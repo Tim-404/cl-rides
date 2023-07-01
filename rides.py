@@ -8,6 +8,7 @@ from cfg.config import GLOBALS, GROUPING_THRESHOLD, SERVICE_ACCT_FILE
 import lib
 import os
 import sys
+import cfg.map
 
 
 def show_usage() -> None:
@@ -53,6 +54,9 @@ def main(fetch: bool, update: bool, rotate: bool, edit: bool, friday: bool, debu
         elif edit:
             #TODO: Load previous output into assignments
             pass
+
+    # Update map of locations
+    cfg.map.update_map(drivers, riders, debug)
 
     # Execute the assignment algorithm
     if friday:
