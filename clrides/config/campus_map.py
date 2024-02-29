@@ -4,12 +4,14 @@
 import pathlib
 import typing
 
+from . import DATAPATH
+
 
 class CampusMap:
     """
     """
-    _path_map = pathlib.Path(__file__).parent / "map.txt"
-    _path_campus = pathlib.Path(__file__).parent / "campus.txt"
+    _path_map = DATAPATH / "map.txt"
+    _path_campus = DATAPATH / "campus.txt"
 
     def __init__(
         self, *, day: typing.Literal["friday", "sunday"],
