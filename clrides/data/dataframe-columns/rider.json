@@ -1,0 +1,9 @@
+{
+    "timestamp": "Timestamp",
+    "rider": "Rider",
+    "phone": "Rider Phone #",
+    "location": "Location",
+    "friday": "Friday",
+    "sunday": "Sunday",
+    "notes": "Notes"
+}

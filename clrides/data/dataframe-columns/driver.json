@@ -1,0 +1,7 @@
+{
+    "timestamp": "Timestamp",
+    "name": "Name",
+    "phone": "Phone Number",
+    "capacity": "Number of Seats in Cear (not including you)",
+    "availability": "Check all that apply."
+}
