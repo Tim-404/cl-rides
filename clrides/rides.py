@@ -2,6 +2,7 @@
 """
 
 import json
+import os
 import pathlib
 import pickle
 import typing
@@ -36,6 +37,8 @@ class Rides:
 
         if set(self._keys_cache) != set(self.sheetids):
             raise KeyError(self.path_sheetids)
+        
+        self.create_cache()
 
     @property
     def path_sa(self) -> pathlib.Path:
@@ -72,6 +75,16 @@ class Rides:
         """
         """
         return {k: self.path_cache / k for k in self.sheetids}
+
+    def create_cache(self) -> None:
+        """
+        """
+        if not self.path_cache.exists():
+            os.makedirs(self.path_cache)
+
+        for sheet_name in self.sheetids:
+            if not (self.path_cache / sheet_name).exists():
+                pd.DataFrame().to_pickle(self.path_cache / sheet_name)
 
     def write_cache(self) -> None:
         """
