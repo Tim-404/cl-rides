@@ -4,6 +4,12 @@
 import argparse
 import logging
 import pathlib
+import sys
+
+from .config.campus_map import CampusMap
+from .config.ignore import Ignore
+from .config.preferences import Preferences
+from .rides import Rides
 
 
 logging.basicConfig(
@@ -69,3 +75,33 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     logging.debug(args)
+
+    rides = Rides()
+    if args["download"]:
+        rides.write_cache()
+
+    for key, value in rides.read_cache().items():
+        logging.debug("%s:\n%s", key, value.to_string())
+
+    drivers = rides.cached_input("drivers")
+    if drivers.empty:
+        logging.error("Empty drivers DataFrame")
+        sys.exit(1)
+
+    riders = rides.cached_input("riders")
+    if riders.empty:
+        logging.error("Empty riders DataFrame")
+        sys.exit(1)
+
+    campus_map = CampusMap(args["day"])
+    logging.debug("Campus Locations: %s", campus_map.campus)
+    logging.debug("Map Locations: %s", campus_map.locations)
+
+    ignore = Ignore()
+    logging.debug("Ignore Drivers: %s", ignore.drivers)
+    logging.debug("Ignore Riders: %s", ignore.riders)
+
+    preferences = Preferences(campus_map.locations)
+    logging.debug("Driver Preferences: %s", preferences.drivers)
+    logging.debug("Driver Preferences (Locations): %s", preferences.locations)
+    logging.debug("Driver Preferences (Services): %s", preferences.services)

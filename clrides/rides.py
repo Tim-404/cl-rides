@@ -37,7 +37,7 @@ class Rides:
 
         if set(self._keys_cache) != set(self.sheetids):
             raise KeyError(self.path_sheetids)
-        
+
         self.create_cache()
 
     @property
