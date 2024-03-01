@@ -14,7 +14,7 @@ class CampusMap:
     _path_campus = DATAPATH / "campus.txt"
 
     def __init__(
-        self, *, day: typing.Literal["friday", "sunday"],
+        self, day: typing.Literal["friday", "sunday"], *,
         path_map: typing.Union[str, pathlib.Path] = _path_map,
         path_campus: typing.Union[str, pathlib.Path] = _path_campus
     ):
@@ -28,7 +28,7 @@ class CampusMap:
 
         self._locations = {}
         with open(self.path_map, "r", encoding="utf-8") as file:
-            loc = 0b1
+            loc = 1
 
             for line in file.readlines():
                 if line.startswith("#"):
@@ -37,7 +37,7 @@ class CampusMap:
                 for place in (x.strip().lower() for x in line.split(",")):
                     if day == "friday" and place in self.campus:
                         place = "campus"
-                    self._locations.setdefault(place, 0b0)
+                    self._locations.setdefault(place, 0)
                     self._locations[place] |= loc
 
                 loc <<= 1
