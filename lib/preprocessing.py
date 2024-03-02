@@ -81,6 +81,7 @@ def _validate_riders(riders_df: pd.DataFrame):
     riders_df[RIDER_TIMESTAMP_HDR] = pd.to_datetime(riders_df[RIDER_TIMESTAMP_HDR])
     riders_df.sort_values(by=RIDER_TIMESTAMP_HDR, inplace=True)
     riders_df.drop_duplicates(subset=RIDER_PHONE_HDR, inplace=True, keep='last')
+    riders_df[RIDER_PHONE_HDR] = riders_df[RIDER_PHONE_HDR].astype(str)
 
 
 
