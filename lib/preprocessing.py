@@ -187,7 +187,7 @@ def add_assignment_vars(drivers_df: pd.DataFrame):
         if loc != '' and loc in LOC_MAP:
             drivers_df.at[idx, TMP_DRIVER_PREF_LOC] = LOC_MAP.get(loc, LOC_NONE)
             cnt_pref += 1
-    logging.info(f'Loaded {cnt_pref} driver location preferences')
+    logging.debug(f'add_assignment_vars --- Loaded {cnt_pref} driver location preferences')
 
 
 
