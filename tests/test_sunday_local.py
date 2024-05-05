@@ -10,11 +10,14 @@ import rides
 
 args = {
     'day': 'sunday',
-    'fetch': False,
-    'update': False,
+    'service': '2',
     'rotate': False,
-    'threshold': 2,
-    'log': 'INFO'
+    'weekly': False,
+    'download': False,
+    'upload': False,
+    'distance': 2,
+    'vacancy': 2,
+    'log': 'info'
 }
 
 rides.main(args)
