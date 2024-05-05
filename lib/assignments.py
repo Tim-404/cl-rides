@@ -100,7 +100,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         if is_matched:
             continue
         
-        logging.warn(f'No driver available for {out.at[r_idx, RIDER_NAME_HDR]}')
+        logging.warn(f'Rider not assigned [{out.at[r_idx, RIDER_NAME_HDR]}]')
         num_skipped += 1
     
     if num_skipped > 0:
