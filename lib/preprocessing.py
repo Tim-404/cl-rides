@@ -74,6 +74,7 @@ def _validate_drivers(drivers_df: pd.DataFrame):
     drivers_df[DRIVER_TIMESTAMP_HDR] = pd.to_datetime(drivers_df[DRIVER_TIMESTAMP_HDR])
     drivers_df[DRIVER_CAPACITY_HDR] = drivers_df[DRIVER_CAPACITY_HDR].astype(int)
     drivers_df[DRIVER_PHONE_HDR] = drivers_df[DRIVER_PHONE_HDR].astype(str)
+    drivers_df[DRIVER_PREF_LOC_HDR] = drivers_df[DRIVER_PREF_LOC_HDR].astype(str)
     drivers_df[DRIVER_NOTES_HDR] = drivers_df[DRIVER_NOTES_HDR].astype(str)
 
 
@@ -142,13 +143,10 @@ def _mark_drivers_with_preferences(drivers_df: pd.DataFrame, riders_df):
     now = Timestamp.now() + pd.Timedelta(seconds=1)
 
     for idx in drivers_df.index:
-        driver_phone = drivers_df.at[idx, DRIVER_PHONE_HDR]
-        if driver_phone in DRIVER_LOC_PREFS:
-            driver_loc_bit = DRIVER_LOC_PREFS[driver_phone]
-            # At least one rider must be left at this location in order to prioritize this driver
-            if loc_freq[driver_loc_bit] > 0:
-                loc_freq[driver_loc_bit] -= drivers_df.at[idx, DRIVER_CAPACITY_HDR]
-                drivers_df.at[idx, DRIVER_TIMESTAMP_HDR] = now
+        driver_loc_bit = drivers_df.at[idx, TMP_DRIVER_PREF_LOC]
+        if driver_loc_bit != LOC_NONE and loc_freq[driver_loc_bit] > 0:
+            loc_freq[driver_loc_bit] -= drivers_df.at[idx, DRIVER_CAPACITY_HDR]
+            drivers_df.at[idx, DRIVER_TIMESTAMP_HDR] = now
 
 
 def fetch_necessary_drivers(drivers_df: pd.DataFrame, cnt_riders: int) -> pd.DataFrame:
@@ -180,11 +178,16 @@ def add_assignment_vars(drivers_df: pd.DataFrame):
     """
     drivers_df[DRIVER_OPENINGS_HDR] = drivers_df[DRIVER_CAPACITY_HDR]
     drivers_df[DRIVER_ROUTE_HDR] = LOC_NONE
-    drivers_df[DRIVER_PREF_LOC_HDR] = LOC_NONE
+    drivers_df[TMP_DRIVER_PREF_LOC] = LOC_NONE
 
     # Load driver location preferences
+    cnt_pref = 0
     for idx in drivers_df.index:
-        drivers_df.at[idx, DRIVER_PREF_LOC_HDR] = DRIVER_LOC_PREFS.get(drivers_df.at[idx, DRIVER_PHONE_HDR], LOC_NONE)
+        loc = drivers_df.at[idx, DRIVER_PREF_LOC_HDR].strip().lower()
+        if loc != '' and loc in LOC_MAP:
+            drivers_df.at[idx, TMP_DRIVER_PREF_LOC] = LOC_MAP.get(loc, LOC_NONE)
+            cnt_pref += 1
+    logging.info(f'Loaded {cnt_pref} driver location preferences')
 
 
 

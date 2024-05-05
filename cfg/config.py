@@ -11,6 +11,7 @@ DRIVER_NAME_HDR = 'Name'
 DRIVER_PHONE_HDR = 'Phone Number'
 DRIVER_CAPACITY_HDR = 'Number of Seats in Car (not including you)'
 DRIVER_AVAILABILITY_HDR = 'Check all that apply.'
+DRIVER_PREF_LOC_HDR = 'Preferred location'
 DRIVER_NOTES_HDR = 'Notes'
 
 RIDER_TIMESTAMP_HDR = 'Timestamp'
@@ -49,7 +50,7 @@ IGNORE_KEYWORD = 'ignore'
 ### Temporaries for assignments
 DRIVER_OPENINGS_HDR = 'Open seats'
 DRIVER_ROUTE_HDR = 'Locations'
-DRIVER_PREF_LOC_HDR = 'Preferred location'
+TMP_DRIVER_PREF_LOC = 'Pref loc'
 DRIVER_SERVICE_HDR = 'Service'
 RIDER_SERVICE_HDR = 'Preferred service'
 
