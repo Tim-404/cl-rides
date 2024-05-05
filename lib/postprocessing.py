@@ -7,6 +7,12 @@ import numpy as np
 import pandas as pd
 
 
+def print_unassigned_riders(out: pd.DataFrame) -> None:
+    for o_idx in out.index:
+        if type(out.at[o_idx, OUTPUT_DRIVER_NAME_HDR]) is not str:
+            logging.warn(f'Rider not assigned: [{out.at[o_idx, RIDER_NAME_HDR]}]')
+
+
 def print_unused_drivers(out: pd.DataFrame, drivers: pd.DataFrame) -> None:
     for d_idx in drivers.index:
         driver_num = drivers.at[d_idx, DRIVER_PHONE_HDR]

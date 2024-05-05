@@ -99,12 +99,6 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         
         if is_matched:
             continue
-        
-        logging.warn(f'Rider not assigned [{out.at[r_idx, RIDER_NAME_HDR]}]')
-        num_skipped += 1
-    
-    if num_skipped > 0:
-        logging.warn(f'Skipped {num_skipped} riders, location ignored')
 
     return out
 
@@ -125,6 +119,7 @@ def assign_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = organize(drivers1, riders1)
     assignments2 = organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
+    post.print_unassigned_riders(out)
     post.print_unused_drivers(out, drivers)
     return out
 
@@ -138,6 +133,7 @@ def assign_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = organize(drivers1, riders1)
     assignments2 = organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
+    post.print_unassigned_riders(out)
     post.print_unused_drivers(out, drivers)
     return out
 
