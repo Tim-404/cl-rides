@@ -12,7 +12,6 @@ import pandas as pd
 def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     """Assigns rider to drivers in the returned dataframe.
     """
-    prep.add_assignment_vars(drivers_df)
     riders_df.sort_values(by=RIDER_LOCATION_HDR, inplace=True, key=lambda col: col.apply(lambda loc: LOC_MAP.get(loc.strip().lower(), LOC_NONE)))
     out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_HDR, OUTPUT_DRIVER_PHONE_HDR, OUTPUT_DRIVER_CAPACITY_HDR]), riders_df[[RIDER_NAME_HDR, RIDER_PHONE_HDR, RIDER_LOCATION_HDR, RIDER_NOTES_HDR]]], axis='columns')
 
@@ -104,6 +103,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
+    prep.add_assignment_vars(drivers_df)
     prep.prioritize_drivers_with_preferences(drivers_df, riders_df)
     drivers = prep.fetch_necessary_drivers(drivers_df, len(riders_df))
     out = assign(drivers, riders_df)
@@ -164,7 +164,7 @@ def _is_there(driver: pd.Series, rider_loc: int) -> bool:
 def _prefers_there(driver: pd.Series, rider_loc: int) -> bool:
     """Checks if driver is already picking up at the same college as the rider.
     """
-    return _has_opening(driver) and (driver[DRIVER_PREF_LOC_HDR] & rider_loc) != 0
+    return _has_opening(driver) and (driver[TMP_DRIVER_PREF_LOC] & rider_loc) != 0
 
 
 def _is_open(driver: pd.Series) -> bool:

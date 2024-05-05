@@ -38,60 +38,7 @@ def load_map():
             loc <<= 1
             cnt += 1
 
-    logging.info(f'{os.path.basename(map_file)} loaded with size={cnt}.')
-
-
-def load_ignored_drivers():
-    """Loads the list of drivers to skip.
-    """
-    try:
-        cnt = 0
-        with open(IGNORE_DRIVERS_FILE, 'r') as drivers:
-            for line in drivers:
-                line = line.split(',')
-                num = line[1].strip()
-                IGNORED_DRIVERS.append(num)
-                cnt += 1
-        logging.info(f'Ignoring {cnt} drivers.')
-    except:
-        logging.info(f'{os.path.basename(IGNORE_DRIVERS_FILE)} not found. No drivers ignored.')
-
-
-def load_ignored_riders():
-    """Loads the list of riders to skip.
-    """
-    try:
-        cnt = 0
-        with open(IGNORE_RIDERS_FILE, 'r') as riders:
-            for line in riders:
-                line = line.split(',')
-                num = line[1].strip()
-                IGNORED_RIDERS.append(num)
-                cnt += 1
-        logging.info(f'Ignoring {cnt} riders.')
-    except:
-        logging.info(f'{os.path.basename(IGNORE_RIDERS_FILE)} not found. No riders ignored.')
-
-
-def load_driver_prefs():
-    """Loads the preferred locations of drivers.
-    """
-    try:
-        cnt = 0
-        with open(DRIVER_PREFS_FILE, 'r') as prefs:
-            for pref in prefs:
-                pref = pref.split(',')
-                phone = pref[1].strip()
-                loc = pref[2].strip().lower()
-                service = pref[3].strip()
-                if loc != '' and loc in LOC_MAP:
-                    DRIVER_LOC_PREFS[phone] = LOC_MAP.get(loc, LOC_NONE)
-                if service != '':
-                    DRIVER_SERVICE_PREFS[phone] = service
-                cnt += 1
-        logging.info(f'Loaded {cnt} driver preferences.')
-    except:
-        logging.info(f'{os.path.basename(DRIVER_PREFS_FILE)} not found. No driver preferences.')
+    logging.info(f'{os.path.basename(map_file)} loaded with size={cnt}')
 
 
 def create_pickles():
@@ -113,7 +60,4 @@ def create_pickles():
 def load(args: dict):
     ARGS.update(args)
     load_map()
-    load_ignored_drivers()
-    load_ignored_riders()
-    load_driver_prefs()
     create_pickles()
