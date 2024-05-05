@@ -45,13 +45,15 @@ def _filter_data(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
 
 
 def _filter_drivers(drivers_df: pd.DataFrame):
-    remove = drivers_df[drivers_df[DRIVER_PHONE_HDR].isin(IGNORED_DRIVERS)]
+    remove = drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].copy()
+    logging.info(f'Ignoring {len(remove.index)} drivers')
     drivers_df.drop(remove.index, inplace=True)
 
 
 def _filter_riders(riders_df: pd.DataFrame):
     riders_df.drop(columns=[RIDER_TIMESTAMP_HDR], inplace=True)
-    remove = riders_df[riders_df[RIDER_PHONE_HDR].isin(IGNORED_RIDERS)]
+    remove = riders_df[riders_df[RIDER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)]
+    logging.info(f'Ignoring {len(remove.index)} riders')
     riders_df.drop(remove.index, inplace=True)
 
 
@@ -72,6 +74,7 @@ def _validate_drivers(drivers_df: pd.DataFrame):
     drivers_df[DRIVER_TIMESTAMP_HDR] = pd.to_datetime(drivers_df[DRIVER_TIMESTAMP_HDR])
     drivers_df[DRIVER_CAPACITY_HDR] = drivers_df[DRIVER_CAPACITY_HDR].astype(int)
     drivers_df[DRIVER_PHONE_HDR] = drivers_df[DRIVER_PHONE_HDR].astype(str)
+    drivers_df[DRIVER_NOTES_HDR] = drivers_df[DRIVER_NOTES_HDR].astype(str)
 
 
 def _validate_riders(riders_df: pd.DataFrame):
@@ -253,7 +256,7 @@ def _add_service_vars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
     """
     drivers_df[DRIVER_SERVICE_HDR] = 0
     for idx in drivers_df.index:
-        drivers_df.at[idx, DRIVER_SERVICE_HDR] = DRIVER_SERVICE_PREFS.get(drivers_df.at[idx, DRIVER_PHONE_HDR], ARGS[PARAM_SERVICE])
+        drivers_df.at[idx, DRIVER_SERVICE_HDR] = _parse_service(drivers_df.at[idx, DRIVER_NOTES_HDR])
 
     riders_df[RIDER_SERVICE_HDR] = 0
     for idx in riders_df.index:
