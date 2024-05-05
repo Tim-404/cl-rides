@@ -57,7 +57,6 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
     # Append enough rows to space out drivers
     total_rows = total_capacity + driver_cnt + unassigned_cnt
     new_out = pd.DataFrame({OUTPUT_DRIVER_NAME_HDR: [''] * total_rows,
-                            OUTPUT_DRIVER_PHONE_HDR: [''] * total_rows,
                             OUTPUT_DRIVER_CAPACITY_HDR: [''] * total_rows,
                             RIDER_NAME_HDR: [''] * total_rows,
                             RIDER_PHONE_HDR: [''] * total_rows,
@@ -86,13 +85,11 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
         if curr_driver_name is np.nan:
             # No driver assigned
             out.at[old_idx, OUTPUT_DRIVER_NAME_HDR] = '?'
-            out.at[old_idx, OUTPUT_DRIVER_PHONE_HDR] = '?'
-            out.at[old_idx, OUTPUT_DRIVER_CAPACITY_HDR] = ''
+            out.at[old_idx, OUTPUT_DRIVER_CAPACITY_HDR] = '?'
             logging.debug(f'_format_output --- {out.at[old_idx, RIDER_NAME_HDR]} has no driver')
         elif not is_next_driver:
             # Remove redundant driver details.
             out.at[old_idx, OUTPUT_DRIVER_NAME_HDR] = ''
-            out.at[old_idx, OUTPUT_DRIVER_PHONE_HDR] = ''
             out.at[old_idx, OUTPUT_DRIVER_CAPACITY_HDR] = ''
 
         _copy_output_row(new_out, out, new_idx, old_idx)
@@ -103,7 +100,6 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
         
 def _copy_output_row(dst: pd.DataFrame, src: pd.DataFrame, dst_idx: int, src_idx: int):
     dst.at[dst_idx, OUTPUT_DRIVER_NAME_HDR] = src.at[src_idx, OUTPUT_DRIVER_NAME_HDR]
-    dst.at[dst_idx, OUTPUT_DRIVER_PHONE_HDR] = src.at[src_idx, OUTPUT_DRIVER_PHONE_HDR]
     dst.at[dst_idx, OUTPUT_DRIVER_CAPACITY_HDR] = src.at[src_idx, OUTPUT_DRIVER_CAPACITY_HDR]
     dst.at[dst_idx, RIDER_NAME_HDR] = src.at[src_idx, RIDER_NAME_HDR]
     dst.at[dst_idx, RIDER_PHONE_HDR] = src.at[src_idx, RIDER_PHONE_HDR]
