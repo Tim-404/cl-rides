@@ -7,6 +7,18 @@ import numpy as np
 import pandas as pd
 
 
+def print_unused_drivers(out: pd.DataFrame, drivers: pd.DataFrame) -> None:
+    for d_idx in drivers.index:
+        driver_num = drivers.at[d_idx, DRIVER_PHONE_HDR]
+        is_available = True
+        for o_idx in out.index:
+            if out.at[o_idx, OUTPUT_DRIVER_PHONE_HDR] == driver_num:
+                is_available = False
+                break
+        if is_available:
+            logging.info(f'Driver still available: [{drivers.at[d_idx, DRIVER_NAME_HDR]}]')
+
+
 def clean_output(out: pd.DataFrame) -> pd.DataFrame:
     """Filters out the unneeded columns and and validates the data before writing.
     """
