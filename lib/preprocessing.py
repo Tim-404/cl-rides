@@ -153,7 +153,6 @@ def fetch_necessary_drivers(drivers_df: pd.DataFrame, cnt_riders: int) -> pd.Dat
     """
     logging.debug(f"fetch_necessary_drivers --- Drivers available:\n{drivers_df}")
     driver_cnt = _find_driver_cnt(drivers_df, cnt_riders)
-    logging.info(f"Using {driver_cnt} drivers")
     drivers = drivers_df.copy()[:driver_cnt]
     drivers.sort_values(by=DRIVER_CAPACITY_HDR, ascending=False, inplace=True)
     logging.debug(f"fetch_necessary_drivers --- Drivers used:\n{drivers}")
