@@ -80,8 +80,8 @@ if __name__ == '__main__':
                         help='choose whether to upload output to Google Sheets')
     parser.add_argument(f'--{PARAM_DISTANCE}', type=int, default=2, choices=range(1, ARG_DISTANCE),
                         help='set how many far a driver can be to pick up at a neighboring location before choosing a last resort driver')
-    parser.add_argument(f'--{PARAM_VACANCY}', type=int, default=2, choices=range(1, ARG_VACANCY),
-                        help='set how many open spots a driver must have to pick up at a neighboring location before choosing a last resort driver')
+    parser.add_argument(f'--{PARAM_VACANCY}', type=int, default=1, choices=range(1, ARG_VACANCY),
+                        help='set how many open spots a driver must have open to pick up at a neighboring location before choosing a last resort driver')
     parser.add_argument(f'--{PARAM_LOG}', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'],
                         help='set a level of verbosity for logging')
     

@@ -21,8 +21,6 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     logging.debug(riders_df)
     logging.debug('assign --- Assigning started')
 
-    num_skipped = 0
-
     # Assign drivers with preferences first
     for r_idx in out.index:
         rider_loc = LOC_MAP.get(out.at[r_idx, RIDER_LOCATION_HDR].strip().lower(), LOC_NONE)
@@ -45,7 +43,6 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         rider_loc = LOC_MAP.get(out.at[r_idx, RIDER_LOCATION_HDR].strip().lower(), LOC_NONE)
 
         if rider_loc == LOC_NONE:
-            num_skipped += 1
             continue
 
         is_matched = False
@@ -95,9 +92,6 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         if open_driver_found:
             _add_rider(out, r_idx, drivers_df, open_driver_idx)
             is_matched = True
-        
-        if is_matched:
-            continue
 
     return out
 
