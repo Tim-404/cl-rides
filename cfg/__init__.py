@@ -41,27 +41,6 @@ def load_map():
     logging.info(f'{os.path.basename(map_file)} loaded with size={cnt}')
 
 
-def load_driver_prefs():
-    """Loads the preferred locations of drivers.
-    """
-    try:
-        cnt = 0
-        with open(DRIVER_PREFS_FILE, 'r') as prefs:
-            for pref in prefs:
-                pref = pref.split(',')
-                phone = pref[1].strip()
-                loc = pref[2].strip().lower()
-                service = pref[3].strip()
-                if loc != '' and loc in LOC_MAP:
-                    DRIVER_LOC_PREFS[phone] = LOC_MAP.get(loc, LOC_NONE)
-                if service != '':
-                    DRIVER_SERVICE_PREFS[phone] = service
-                cnt += 1
-        logging.info(f'Loaded {cnt} driver preferences')
-    except:
-        logging.warning(f'{os.path.basename(DRIVER_PREFS_FILE)} not found. No driver preferences.')
-
-
 def create_pickles():
     """Create cache files in pickle directory.
     """
@@ -81,5 +60,4 @@ def create_pickles():
 def load(args: dict):
     ARGS.update(args)
     load_map()
-    load_driver_prefs()
     create_pickles()
