@@ -195,7 +195,7 @@ def add_assignment_vars(drivers_df: pd.DataFrame):
 ###                             FRIDAY SETUP                            ###
 ###########################################################################
 def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Filters riders that will attend Friday College Life AND are from campus.
+    """Filters out riders who will get a ride from Peterson.
     """
     _mark_late_friday_riders(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_FRIDAY_HDR] == RIDE_THERE_KEYWORD]
@@ -220,12 +220,15 @@ def _mark_late_friday_riders(riders_df: pd.DataFrame):
 def split_friday_late_cars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Separates rides for late riders. Also designates drivers for the late riders.
     """
-    riders1 = riders_df[~riders_df[RIDER_NOTES_HDR].str.lower().str.contains('late')].copy()
-    riders2 = riders_df[riders_df[RIDER_NOTES_HDR].str.lower().str.contains('late')].copy()
+    riders1 = riders_df[~riders_df[RIDER_LOCATION_HDR].str.contains(CAMPUS)].copy()
+    riders2 = riders_df[riders_df[RIDER_LOCATION_HDR].str.contains(CAMPUS)].copy()
 
     late_driver_cnt = _find_driver_cnt(drivers_df, len(riders2))
     drivers1 = drivers_df[late_driver_cnt:].copy()
     drivers2 = drivers_df[:late_driver_cnt].copy()
+
+    drivers1[DRIVER_GROUP_HDR] = 1
+    drivers2[DRIVER_GROUP_HDR] = 2
 
     return (drivers1, riders1, drivers2, riders2)
 
@@ -247,8 +250,8 @@ def split_sunday_services(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> 
     @returns (drivers1, riders1, drivers2, riders2)
     """
     _add_service_vars(drivers_df, riders_df)
-    drivers1 = drivers_df[drivers_df[DRIVER_SERVICE_HDR] == ARG_FIRST_SERVICE].copy()
-    drivers2 = drivers_df[drivers_df[DRIVER_SERVICE_HDR] == ARG_SECOND_SERVICE].copy()
+    drivers1 = drivers_df[drivers_df[DRIVER_GROUP_HDR] == ARG_FIRST_SERVICE].copy()
+    drivers2 = drivers_df[drivers_df[DRIVER_GROUP_HDR] == ARG_SECOND_SERVICE].copy()
     riders1  = riders_df[riders_df[RIDER_SERVICE_HDR] == ARG_FIRST_SERVICE].copy()
     riders2  = riders_df[riders_df[RIDER_SERVICE_HDR] == ARG_SECOND_SERVICE].copy()
     return (drivers1, riders1, drivers2, riders2)
@@ -257,9 +260,9 @@ def split_sunday_services(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> 
 def _add_service_vars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
     """Adds temporary columns to the dataframes for splitting between first and second service.
     """
-    drivers_df[DRIVER_SERVICE_HDR] = 0
+    drivers_df[DRIVER_GROUP_HDR] = 0
     for idx in drivers_df.index:
-        drivers_df.at[idx, DRIVER_SERVICE_HDR] = _parse_service(drivers_df.at[idx, DRIVER_NOTES_HDR])
+        drivers_df.at[idx, DRIVER_GROUP_HDR] = _parse_service(drivers_df.at[idx, DRIVER_NOTES_HDR])
 
     riders_df[RIDER_SERVICE_HDR] = 0
     for idx in riders_df.index:

@@ -51,7 +51,7 @@ IGNORE_KEYWORD = 'ignore'
 DRIVER_OPENINGS_HDR = 'Open seats'
 DRIVER_ROUTE_HDR = 'Locations'
 TMP_DRIVER_PREF_LOC = 'Pref loc'
-DRIVER_SERVICE_HDR = 'Service'
+DRIVER_GROUP_HDR = 'Group'
 RIDER_SERVICE_HDR = 'Preferred service'
 
 ### File paths

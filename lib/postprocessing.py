@@ -37,9 +37,7 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
     if len(out) == 0:
         return
     
-    out.sort_values(by=[OUTPUT_DRIVER_NAME_HDR, RIDER_LOCATION_HDR], inplace=True)
-    # Place first service cars at the bottom, use mergesort because it is stable
-    out.sort_values(by=[DRIVER_SERVICE_HDR], inplace=True, ascending=False, kind='mergesort')
+    out.sort_values(by=[DRIVER_GROUP_HDR, OUTPUT_DRIVER_NAME_HDR, RIDER_LOCATION_HDR], inplace=True)
     out.reset_index(inplace=True, drop=True)
 
     driver_cnt = 1

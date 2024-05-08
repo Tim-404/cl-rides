@@ -13,7 +13,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     """Assigns rider to drivers in the returned dataframe.
     """
     riders_df.sort_values(by=RIDER_LOCATION_HDR, inplace=True, key=lambda col: col.apply(lambda loc: LOC_MAP.get(loc.strip().lower(), LOC_NONE)))
-    out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_HDR, OUTPUT_DRIVER_PHONE_HDR, OUTPUT_DRIVER_CAPACITY_HDR, DRIVER_SERVICE_HDR]), riders_df[[RIDER_NAME_HDR, RIDER_PHONE_HDR, RIDER_LOCATION_HDR, RIDER_NOTES_HDR]]], axis='columns')
+    out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_HDR, OUTPUT_DRIVER_PHONE_HDR, OUTPUT_DRIVER_CAPACITY_HDR, DRIVER_GROUP_HDR]), riders_df[[RIDER_NAME_HDR, RIDER_PHONE_HDR, RIDER_LOCATION_HDR, RIDER_NOTES_HDR]]], axis='columns')
 
     logging.debug('assign --- Drivers')
     logging.debug(drivers_df)
@@ -138,7 +138,7 @@ def _add_rider(out: pd.DataFrame, r_idx: int, drivers_df: pd.DataFrame, d_idx: i
     out.at[r_idx, OUTPUT_DRIVER_NAME_HDR] = drivers_df.at[d_idx, DRIVER_NAME_HDR]
     out.at[r_idx, OUTPUT_DRIVER_PHONE_HDR] = drivers_df.at[d_idx, DRIVER_PHONE_HDR]
     out.at[r_idx, OUTPUT_DRIVER_CAPACITY_HDR] = drivers_df.at[d_idx, DRIVER_CAPACITY_HDR].astype(str)
-    out.at[r_idx, DRIVER_SERVICE_HDR] = drivers_df.at[d_idx, DRIVER_SERVICE_HDR]
+    out.at[r_idx, DRIVER_GROUP_HDR] = drivers_df.at[d_idx, DRIVER_GROUP_HDR]
     rider_loc = LOC_MAP.get(out.at[r_idx, RIDER_LOCATION_HDR].strip().lower(), LOC_NONE)
     drivers_df.at[d_idx, DRIVER_OPENINGS_HDR] -= 1
     drivers_df.at[d_idx, DRIVER_ROUTE_HDR] |= rider_loc
