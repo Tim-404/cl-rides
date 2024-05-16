@@ -51,7 +51,7 @@ IGNORE_KEYWORD = 'ignore'
 DRIVER_OPENINGS_HDR = 'Open seats'
 DRIVER_ROUTE_HDR = 'Locations'
 TMP_DRIVER_PREF_LOC = 'Pref loc'
-DRIVER_SERVICE_HDR = 'Service'
+DRIVER_GROUP_HDR = 'Group'
 RIDER_SERVICE_HDR = 'Preferred service'
 
 ### File paths
@@ -79,24 +79,24 @@ PARAM_DAY = 'day'
 ARG_FRIDAY = 'friday'
 ARG_SUNDAY = 'sunday'
 
-OPT_SERVICE = 'main-service'    # argparse converts - to _
-PARAM_SERVICE = 'main_service'
+PARAM_SERVICE = 'service'
 ARG_FIRST_SERVICE = '1'
 ARG_SECOND_SERVICE = '2'
 
 PARAM_ROTATE = 'rotate'
-OPT_JUST_WEEKLY = 'just-weekly' # argparse converts - to _
-PARAM_JUST_WEEKLY = 'just_weekly'
+PARAM_JUST_WEEKLY = 'weekly'
 PARAM_UPLOAD = 'upload'
 PARAM_DOWNLOAD = 'download'
 
 PARAM_DISTANCE = 'distance'
-ARG_DISTANCE = 10
+ARG_DISTANCE_MAX = 10
 ### The number of openings required for a car to freely pick up from a neighboring location
-PARAM_VACANCY = 'vacancy'
-ARG_VACANCY = 10
+PARAM_GROUP_SZ = 'groupsize'
+ARG_GROUP_SZ_MAX = 3
 
 PARAM_LOG = 'log'
+
+MAX_ROUTE_DIST = 40 # > map width
 
 ### Route codes
 LOC_NONE = 0b0
@@ -105,8 +105,3 @@ LOC_NONE = 0b0
 LOC_MAP = {
 }
 CAMPUS_LOCS = set()
-
-IGNORED_DRIVERS = []
-IGNORED_RIDERS = []
-DRIVER_LOC_PREFS = {}
-DRIVER_SERVICE_PREFS = {}

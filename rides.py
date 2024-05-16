@@ -68,20 +68,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(f'--{PARAM_DAY}', required=True, choices=[ARG_FRIDAY, ARG_SUNDAY],
                         help=f'choose either \'{ARG_FRIDAY}\' for CL, or \'{ARG_SUNDAY}\' for church')
-    parser.add_argument(f'--{OPT_SERVICE}', default=ARG_SECOND_SERVICE, choices=[ARG_FIRST_SERVICE, ARG_SECOND_SERVICE],
+    parser.add_argument(f'--{PARAM_SERVICE}', default=ARG_SECOND_SERVICE, choices=[ARG_FIRST_SERVICE, ARG_SECOND_SERVICE],
                         help='select the main Sunday service (i.e. select 1st service during weeks with ACE classes)')
     parser.add_argument(f'--{PARAM_ROTATE}', action='store_true',
                         help='drivers are rotated based on date last driven')
-    parser.add_argument(f'--{OPT_JUST_WEEKLY}', action='store_true',
-                        help='use only the weekly rides for for these assignments (i.e. holidays)')
     parser.add_argument(f'--{PARAM_DOWNLOAD}', action=argparse.BooleanOptionalAction, default=True,
                         help='choose whether to download Google Sheets data')
     parser.add_argument(f'--{PARAM_UPLOAD}', action=argparse.BooleanOptionalAction, default=True,
                         help='choose whether to upload output to Google Sheets')
-    parser.add_argument(f'--{PARAM_DISTANCE}', type=int, default=2, choices=range(1, ARG_DISTANCE),
+    parser.add_argument(f'--{PARAM_JUST_WEEKLY}', action='store_true',
+                        help='use only the weekly rides for for these assignments (i.e. holidays)')
+    parser.add_argument(f'--{PARAM_DISTANCE}', type=int, default=2, choices=range(1, ARG_DISTANCE_MAX + 1),
                         help='set how many far a driver can be to pick up at a neighboring location before choosing a last resort driver')
-    parser.add_argument(f'--{PARAM_VACANCY}', type=int, default=2, choices=range(1, ARG_VACANCY),
-                        help='set how many open spots a driver must have to pick up at a neighboring location before choosing a last resort driver')
+    parser.add_argument(f'--{PARAM_GROUP_SZ}', type=int, default=1, choices=range(1, ARG_GROUP_SZ_MAX + 1),
+                        help='set how many riders must be leftover at a location for a driver to pick up from there')
     parser.add_argument(f'--{PARAM_LOG}', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'],
                         help='set a level of verbosity for logging')
     
