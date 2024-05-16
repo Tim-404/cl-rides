@@ -79,22 +79,20 @@ PARAM_DAY = 'day'
 ARG_FRIDAY = 'friday'
 ARG_SUNDAY = 'sunday'
 
-OPT_SERVICE = 'main-service'    # argparse converts - to _
-PARAM_SERVICE = 'main_service'
+PARAM_SERVICE = 'service'
 ARG_FIRST_SERVICE = '1'
 ARG_SECOND_SERVICE = '2'
 
 PARAM_ROTATE = 'rotate'
-OPT_JUST_WEEKLY = 'just-weekly' # argparse converts - to _
-PARAM_JUST_WEEKLY = 'just_weekly'
+PARAM_JUST_WEEKLY = 'weekly'
 PARAM_UPLOAD = 'upload'
 PARAM_DOWNLOAD = 'download'
 
 PARAM_DISTANCE = 'distance'
-ARG_DISTANCE = 10
+ARG_DISTANCE_MAX = 10
 ### The number of openings required for a car to freely pick up from a neighboring location
-PARAM_VACANCY = 'vacancy'
-ARG_VACANCY = 10
+PARAM_GROUP_SZ = 'groupsize'
+ARG_GROUP_SZ_MAX = 3
 
 PARAM_LOG = 'log'
 

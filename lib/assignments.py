@@ -57,10 +57,10 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         if is_matched:
             continue
 
-        # Check if there is a driver up to DISTANCE_THRESHOLD away with at least VACANCY_THRESHOLD spots.
+        # Check if there is a driver up to DISTANCE_THRESHOLD.
         for dist in range(1, ARGS[PARAM_DISTANCE] + 1):
             for d_idx, driver in drivers_df.iterrows():
-                if _is_nearby_dist(driver, rider_loc, dist) and driver[DRIVER_OPENINGS_HDR] >= ARGS[PARAM_VACANCY]:
+                if _is_nearby_dist(driver, rider_loc, dist):
                     _add_rider(out, r_idx, drivers_df, d_idx)
                     is_matched = True
                     break
@@ -155,14 +155,14 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
 
     # Assign at locations that are greater than capacity, as long as leftover is greater than OVERFLOW_BOUND
     # Essentially, splits up riders in a single location among multiple cars
-    OVERFLOW_BOUND = 2
+    MIN_GROUP_SZ = 2
     for d_idx in drivers_df.index:
         if not _has_opening(drivers_df, d_idx):
             continue
 
         for loc in rider_map:
             is_matched = False
-            if len(rider_map[loc]) - drivers_df.at[d_idx, DRIVER_OPENINGS_HDR] >= OVERFLOW_BOUND:
+            if len(rider_map[loc]) - drivers_df.at[d_idx, DRIVER_OPENINGS_HDR] >= MIN_GROUP_SZ:
                 # Fill up car
                 is_matched = True
                 while len(rider_map[loc]) > 0:
@@ -201,7 +201,7 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
                 if is_matched:
                     break
 
-        for dist in range(1, ARGS[PARAM_DISTANCE]):
+        for dist in range(0, ARGS[PARAM_DISTANCE] + 1):
             if not _has_opening(drivers_df, d_idx):
                 break
 
@@ -209,7 +209,8 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
                 if len(rider_map[loc]) == 0:
                     continue
 
-                if _is_nearby_dist(drivers_df, d_idx, loc, dist):
+                oflow = len(rider_map[loc]) - drivers_df.at[d_idx, DRIVER_OPENINGS_HDR]
+                if _is_nearby_dist(drivers_df, d_idx, loc, dist) and (oflow >= MIN_GROUP_SZ or oflow <= 0):
                     while len(rider_map[loc]) > 0 and _has_opening(drivers_df, d_idx):
                         r_idx = rider_map[loc].pop()
                         _add_rider(out, r_idx, drivers_df, d_idx)
