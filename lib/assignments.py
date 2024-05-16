@@ -224,11 +224,14 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
             # Find any driver with space and with the lightest route.
             open_driver_idx = -1
             open_driver_found = False
+            cost = 100 # arbitrarily high, but > MAP_WIDTH + 10 is good
             for d_idx in drivers_df.index:
                 if _has_opening(drivers_df, d_idx):
-                    if not open_driver_found or (_route_len(drivers_df.at[d_idx, DRIVER_ROUTE_HDR]) < _route_len(drivers_df.at[open_driver_idx, DRIVER_ROUTE_HDR])):
+                    new_cost = _route_cost(drivers_df.at[d_idx, DRIVER_ROUTE_HDR], loc)
+                    if not open_driver_found or (new_cost < cost):
+                        open_driver_found = True
                         open_driver_idx = d_idx
-                    open_driver_found = True
+                        cost = new_cost
             if open_driver_found:
                 _add_rider(out, r_idx, drivers_df, open_driver_idx)
                 is_matched = True
@@ -328,6 +331,16 @@ def _is_intersecting(drivers_df: pd.DataFrame, d_idx: int, rider_loc: int) -> bo
     driver_loc = drivers_df.at[d_idx, DRIVER_ROUTE_HDR]
     return (driver_loc & rider_loc) != 0
 
+
+def _route_cost(route: int, new_loc: int) -> int:
+    return _route_len(route) + _route_dist(route, new_loc)
+
+def _route_dist(route: int, new_loc: int) -> int:
+    for dist in range(0, MAX_ROUTE_DIST):
+        tmp = (new_loc << dist) | (new_loc >> dist)
+        if (route & tmp) != 0:
+            return dist
+    return MAX_ROUTE_DIST
 
 def _route_len(route: int) -> int:
     """Returns the number of locations a driver is picking up from.

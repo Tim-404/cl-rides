@@ -96,6 +96,8 @@ ARG_GROUP_SZ_MAX = 3
 
 PARAM_LOG = 'log'
 
+MAX_ROUTE_DIST = 40 # > map width
+
 ### Route codes
 LOC_NONE = 0b0
 
