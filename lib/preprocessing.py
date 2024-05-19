@@ -126,7 +126,6 @@ def _get_prev_driver_phones(prev_out: pd.DataFrame) -> set:
 def prioritize_drivers_with_preferences(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
     _mark_drivers_with_preferences(drivers_df, riders_df)
     drivers_df.sort_values(by=DRIVER_TIMESTAMP_HDR, inplace=True, ascending=False)
-    pass
 
 
 def _mark_drivers_with_preferences(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):

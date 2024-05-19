@@ -30,7 +30,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
 
         # Check if a driver prefers to pick up there.
         for d_idx, driver in drivers_df.iterrows():
-            if _prefers_there(driver, rider_loc):
+            if _prefers_there(drivers_df, d_idx, rider_loc):
                 _add_rider(out, r_idx, drivers_df, d_idx)
                 is_matched = True
                 break
@@ -49,7 +49,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
 
         # Check if a driver is already there.
         for d_idx, driver in drivers_df.iterrows():
-            if _is_there(driver, rider_loc):
+            if _is_there(drivers_df, d_idx, rider_loc):
                 _add_rider(out, r_idx, drivers_df, d_idx)
                 is_matched = True
                 break
@@ -60,7 +60,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         # Check if there is a driver up to DISTANCE_THRESHOLD.
         for dist in range(1, ARGS[PARAM_DISTANCE] + 1):
             for d_idx, driver in drivers_df.iterrows():
-                if _is_nearby_dist(driver, rider_loc, dist):
+                if _is_nearby_dist(drivers_df, d_idx, rider_loc, dist):
                     _add_rider(out, r_idx, drivers_df, d_idx)
                     is_matched = True
                     break
@@ -73,7 +73,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
 
         # Check if any driver is open.
         for d_idx, driver in drivers_df.iterrows():
-            if _is_unused(driver):
+            if _is_unused(drivers_df, d_idx):
                 _add_rider(out, r_idx, drivers_df, d_idx)
                 is_matched = True
                 break
@@ -85,7 +85,7 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
         open_driver_idx = -1
         open_driver_found = False
         for d_idx, driver in drivers_df.iterrows():
-            if _has_opening(driver):
+            if _has_opening(drivers_df, d_idx):
                 if not open_driver_found or (_route_len(driver[DRIVER_ROUTE_HDR]) < _route_len(drivers_df.at[open_driver_idx, DRIVER_ROUTE_HDR])):
                     open_driver_idx = d_idx
                 open_driver_found = True
@@ -244,8 +244,8 @@ def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     prep.prioritize_drivers_with_preferences(drivers_df, riders_df)
     rider_map = prep.create_rider_map(riders_df)
     drivers = prep.fetch_necessary_drivers(drivers_df, len(riders_df))
-    # out = assign(drivers, riders_df)
-    out = assign_v2(drivers, riders_df, rider_map)
+    out = assign(drivers, riders_df)
+    # out = assign_v2(drivers, riders_df, rider_map)
     return out
 
 
@@ -336,6 +336,12 @@ def _route_cost(route: int, new_loc: int) -> int:
     return _route_len(route) + _route_dist(route, new_loc)
 
 def _route_dist(route: int, new_loc: int) -> int:
+    """Returns how far a rider is from a driver route.
+    """
+
+    # force case numpy.int64 => int
+    route = int(route)
+
     for dist in range(0, MAX_ROUTE_DIST):
         tmp = (new_loc << dist) | (new_loc >> dist)
         if (route & tmp) != 0:
