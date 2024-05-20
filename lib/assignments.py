@@ -165,7 +165,7 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
             if len(rider_map[loc]) - drivers_df.at[d_idx, DRIVER_OPENINGS_HDR] >= MIN_GROUP_SZ:
                 # Fill up car
                 is_matched = True
-                while len(rider_map[loc]) > 0:
+                while len(rider_map[loc]) > 0 and _has_opening(drivers_df, d_idx):
                     r_idx = rider_map[loc].pop()
                     _add_rider(out, r_idx, drivers_df, d_idx)
             if is_matched:
