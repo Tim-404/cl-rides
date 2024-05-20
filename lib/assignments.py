@@ -244,8 +244,8 @@ def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     prep.prioritize_drivers_with_preferences(drivers_df, riders_df)
     rider_map = prep.create_rider_map(riders_df)
     drivers = prep.fetch_necessary_drivers(drivers_df, len(riders_df))
-    out = assign(drivers, riders_df)
-    # out = assign_v2(drivers, riders_df, rider_map)
+    # out = assign(drivers, riders_df)
+    out = assign_v2(drivers, riders_df, rider_map)
     return out
 
 
@@ -339,7 +339,7 @@ def _route_dist(route: int, new_loc: int) -> int:
     """Returns how far a rider is from a driver route.
     """
 
-    # force case numpy.int64 => int
+    # force cast numpy.int64 => int
     route = int(route)
 
     for dist in range(0, MAX_ROUTE_DIST):

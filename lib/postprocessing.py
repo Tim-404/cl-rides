@@ -12,6 +12,13 @@ def print_unassigned_riders(out: pd.DataFrame) -> None:
         if type(out.at[o_idx, OUTPUT_DRIVER_NAME_HDR]) is not str:
             logging.warn(f'Rider not assigned: [{out.at[o_idx, RIDER_NAME_HDR]}]')
 
+    # Count picked up riders
+    cnt_riders_picked_up = 0
+    for r_idx in out.index:
+        if type(out.at[r_idx, OUTPUT_DRIVER_NAME_HDR]) is str:
+            cnt_riders_picked_up += 1
+    logging.info(f'Picking up {cnt_riders_picked_up}/{len(out.index)} riders')
+
 
 def print_unused_drivers(out: pd.DataFrame, drivers: pd.DataFrame) -> None:
     for d_idx in drivers.index:

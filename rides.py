@@ -55,7 +55,6 @@ def main(args: dict) -> None:
     else:
         out = core.assign_sunday(drivers, riders)
     
-    logging.info(f'Picking up {len(out.index)} riders')
     # Print output
     out = post.clean_output(out)
     logging.debug(f'main --- Assignments output\n{out}')
