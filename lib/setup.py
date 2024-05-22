@@ -1,99 +1,18 @@
-"""Implements all the preprocessing functionality for the data.
+"""Includes setup routines necessary to run the assignment algorithm.
 """
 
 from cfg.config import *
 import lib.rides_data as data
+import lib.stat as stat
 import logging
 import pandas as pd
 from sqlite3 import Timestamp
 
 
-
-#########################################################################
-###                             VALIDATION                            ###
-#########################################################################
-def standardize_permanent_responses(riders_df: pd.DataFrame):
-    """Standardize the permanent responses for Friday and Sunday rides.
-    """
-    for idx in riders_df.index:
-        response = riders_df.at[idx, PERMANENT_RIDER_FRIDAY_HDR]
-        riders_df.at[idx, PERMANENT_RIDER_FRIDAY_HDR] = RIDE_THERE_KEYWORD if PERMANENT_RIDE_THERE_KEYWORD in response.lower() else ''
-        response = riders_df.at[idx, PERMANENT_RIDER_SUNDAY_HDR]
-        riders_df.at[idx, PERMANENT_RIDER_SUNDAY_HDR] = RIDE_THERE_KEYWORD if PERMANENT_RIDE_THERE_KEYWORD in response.lower() else ''
-
-
-def standardize_weekly_responses(riders_df: pd.DataFrame):
-    """Standardize the weekly responses for Friday and Sunday rides.
-    """
-    for idx in riders_df.index:
-        response = riders_df.at[idx, WEEKLY_RIDER_FRIDAY_HDR]
-        riders_df.at[idx, WEEKLY_RIDER_FRIDAY_HDR] = RIDE_THERE_KEYWORD if WEEKLY_RIDE_THERE_KEYWORD in response.lower() else ''
-        response = riders_df.at[idx, WEEKLY_RIDER_SUNDAY_HDR]
-        riders_df.at[idx, WEEKLY_RIDER_SUNDAY_HDR] = RIDE_THERE_KEYWORD if WEEKLY_RIDE_THERE_KEYWORD in response.lower() else ''
-
-
-def clean_data(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
-    """Filters out the unneeded columns and and validates the data before assigning.
-    """
-    _validate_data(drivers_df, riders_df)
-    _filter_data(drivers_df, riders_df)
-
-
-def _filter_data(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
-    _filter_drivers(drivers_df)
-    _filter_riders(riders_df)
-
-
-def _filter_drivers(drivers_df: pd.DataFrame):
-    pass
-
-
-def _filter_riders(riders_df: pd.DataFrame):
-    riders_df.drop(columns=[RIDER_TIMESTAMP_HDR], inplace=True)
-
-
-def _validate_data(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
-    """Recovers proper datatypes and removes duplicates
-    """
-    _validate_drivers(drivers_df)
-    _validate_riders(riders_df)
-
-
-def _validate_drivers(drivers_df: pd.DataFrame):
-    """Enforces datetime datatype on the timestamp and drops duplicates from the drivers list.
-
-    Enforcing the datetime datatype allows us to order the drivers when rewriting them to the sheet to implement cycling.
-    """
-    drivers_df.drop(drivers_df[ drivers_df[DRIVER_PHONE_HDR] == '' ].index, inplace=True)
-    drivers_df.drop_duplicates(subset=DRIVER_PHONE_HDR, inplace=True, keep='last')
-    drivers_df[DRIVER_TIMESTAMP_HDR] = pd.to_datetime(drivers_df[DRIVER_TIMESTAMP_HDR])
-    drivers_df[DRIVER_CAPACITY_HDR] = drivers_df[DRIVER_CAPACITY_HDR].astype(int)
-    drivers_df[DRIVER_PHONE_HDR] = drivers_df[DRIVER_PHONE_HDR].astype(str)
-    drivers_df[DRIVER_PREF_LOC_HDR] = drivers_df[DRIVER_PREF_LOC_HDR].astype(str)
-    drivers_df[DRIVER_NOTES_HDR] = drivers_df[DRIVER_NOTES_HDR].astype(str)
-
-
-def _validate_riders(riders_df: pd.DataFrame):
-    """Drops the oldest duplicates from the riders list.
-    """
-    riders_df.drop(riders_df[ riders_df[RIDER_PHONE_HDR] == '' ].index, inplace=True)
-    riders_df[RIDER_TIMESTAMP_HDR] = pd.to_datetime(riders_df[RIDER_TIMESTAMP_HDR])
-    riders_df.sort_values(by=RIDER_TIMESTAMP_HDR, inplace=True)
-    riders_df.drop_duplicates(subset=RIDER_PHONE_HDR, inplace=True, keep='last')
-    riders_df[RIDER_PHONE_HDR] = riders_df[RIDER_PHONE_HDR].astype(str)
-
-
-
 #############################################################################
-##                              PREPROCESSING                              ##
+##                                 COMMON                                  ##
 #############################################################################
-def rotate_drivers(drivers_df: pd.DataFrame):
-    _mark_unused_drivers(drivers_df)
-    drivers_df.sort_values(by=DRIVER_TIMESTAMP_HDR, inplace=True, ascending=False)
-    data.update_drivers_locally(drivers_df)
-
-
-def _mark_unused_drivers(drivers_df: pd.DataFrame):
+def mark_unused_drivers(drivers_df: pd.DataFrame):
     """Set timestamps of drivers that were not used the previous week.
     """
     prev_out = data.get_cached_output()
@@ -204,16 +123,6 @@ def create_rider_map(riders_df: pd.DataFrame):
     return rider_map
 
 
-def _cnt_drivers_labeled_ignore(drivers_df: pd.DataFrame):
-    cnt_drivers_labeled_ignore = len(drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
-    logging.info(f'{cnt_drivers_labeled_ignore} drivers labeled "ignore"')
-
-
-def _cnt_riders_labeled_ignore(riders_df: pd.DataFrame):
-    cnt_riders_labeled_ignore = len(riders_df[riders_df[RIDER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
-    logging.info(f'{cnt_riders_labeled_ignore} riders labeled "ignore"')
-
-
 def _ignore_drivers(drivers_df: pd.DataFrame):
     remove = drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)]
     logging.info(f'Ignoring {len(remove.index)} drivers')
@@ -232,9 +141,13 @@ def _ignore_riders(riders_df: pd.DataFrame):
 def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Filters out riders who will get a ride from Peterson.
     """
+    stat.print_cnt_drivers_labeled_ignore(drivers_df)
+    stat.print_cnt_riders_labeled_ignore(riders_df)
+
+    drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_FRIDAY_KEYWORD)]
+    _ignore_drivers(drivers)
 
     _mark_late_friday_riders(riders_df)
-    _cnt_riders_labeled_ignore(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_FRIDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
     num_riders = len(riders.index)
@@ -242,9 +155,6 @@ def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
     num_on_campus = num_riders - len(riders.index)
     logging.info(f"Skipping {num_on_campus} on-campus riders, they need rides from Peterson.")
 
-    _cnt_drivers_labeled_ignore(drivers_df)
-    drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_FRIDAY_KEYWORD)]
-    _ignore_drivers(drivers)
     return (drivers, riders)
 
 
@@ -281,13 +191,14 @@ def split_friday_late_cars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) ->
 def filter_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Filters riders that will attend Sunday service.
     """
-    _cnt_riders_labeled_ignore(riders_df)
-    riders = riders_df.copy()[riders_df[RIDER_SUNDAY_HDR] == RIDE_THERE_KEYWORD]
-    _ignore_riders(riders)
+    stat.print_cnt_drivers_labeled_ignore(drivers_df)
+    stat.print_cnt_riders_labeled_ignore(riders_df)
     
-    _cnt_drivers_labeled_ignore(drivers_df)
     drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_SUNDAY_KEYWORD)]
     _ignore_drivers(drivers)
+
+    riders = riders_df.copy()[riders_df[RIDER_SUNDAY_HDR] == RIDE_THERE_KEYWORD]
+    _ignore_riders(riders)
     return (drivers, riders)
 
 

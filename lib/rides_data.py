@@ -4,7 +4,7 @@
 from cfg.config import *
 import gspread
 import json
-import lib.preprocessing as prep
+import lib.validation as prep
 import logging
 import numpy as np
 import os
@@ -82,6 +82,8 @@ def get_cached_input() -> Tuple[pd.DataFrame, pd.DataFrame]:
         riders = pd.concat([permanent_riders, weekly_riders])
     riders.reset_index(inplace=True, drop=True)
 
+    prep.clean_data(drivers, riders)
+    
     return (drivers, riders)
 
 

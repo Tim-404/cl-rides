@@ -4,7 +4,8 @@ Includes group optimization for common pickup locations.
 
 from cfg.config import *
 import lib.postprocessing as post
-import lib.preprocessing as prep
+import lib.setup as setup
+import lib.stat as stat
 import logging
 import pandas as pd
 
@@ -240,40 +241,12 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
 
 
 def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
-    prep.add_assignment_vars(drivers_df)
-    prep.prioritize_drivers_with_preferences(drivers_df, riders_df)
-    rider_map = prep.create_rider_map(riders_df)
-    drivers = prep.fetch_necessary_drivers(drivers_df, len(riders_df))
+    setup.add_assignment_vars(drivers_df)
+    setup.prioritize_drivers_with_preferences(drivers_df, riders_df)
+    rider_map = setup.create_rider_map(riders_df)
+    drivers = setup.fetch_necessary_drivers(drivers_df, len(riders_df))
     # out = assign(drivers, riders_df)
     out = assign_v2(drivers, riders_df, rider_map)
-    return out
-
-
-def assign_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
-    """Assigns Sunday rides.
-    """
-    (drivers, riders) = prep.filter_sunday(drivers_df, riders_df)
-    (drivers1, riders1, drivers2, riders2) = prep.split_sunday_services(drivers, riders)
-
-    assignments1 = organize(drivers1, riders1)
-    assignments2 = organize(drivers2, riders2)
-    out = pd.concat([assignments1, assignments2])
-    post.print_unassigned_riders(out)
-    post.print_unused_drivers(out, drivers)
-    return out
-
-
-def assign_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
-    """Assigns Friday rides.
-    """
-    (drivers, riders) = prep.filter_friday(drivers_df, riders_df)
-    (drivers1, riders1, drivers2, riders2) = prep.split_friday_late_cars(drivers, riders)
-
-    assignments1 = organize(drivers1, riders1)
-    assignments2 = organize(drivers2, riders2)
-    out = pd.concat([assignments1, assignments2])
-    post.print_unassigned_riders(out)
-    post.print_unused_drivers(out, drivers)
     return out
 
 
