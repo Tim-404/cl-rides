@@ -250,34 +250,6 @@ def organize(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def assign_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
-    """Assigns Sunday rides.
-    """
-    (drivers, riders) = setup.filter_sunday(drivers_df, riders_df)
-    (drivers1, riders1, drivers2, riders2) = setup.split_sunday_services(drivers, riders)
-
-    assignments1 = organize(drivers1, riders1)
-    assignments2 = organize(drivers2, riders2)
-    out = pd.concat([assignments1, assignments2])
-    stat.print_unassigned_riders(out)
-    stat.print_unused_drivers(out, drivers)
-    return out
-
-
-def assign_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
-    """Assigns Friday rides.
-    """
-    (drivers, riders) = setup.filter_friday(drivers_df, riders_df)
-    (drivers1, riders1, drivers2, riders2) = setup.split_friday_late_cars(drivers, riders)
-
-    assignments1 = organize(drivers1, riders1)
-    assignments2 = organize(drivers2, riders2)
-    out = pd.concat([assignments1, assignments2])
-    stat.print_unassigned_riders(out)
-    stat.print_unused_drivers(out, drivers)
-    return out
-
-
 def _add_rider(out: pd.DataFrame, r_idx: int, drivers_df: pd.DataFrame, d_idx: int):
     """Assigns rider to driver and updates driver openings and locations.
     """

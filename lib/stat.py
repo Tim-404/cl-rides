@@ -5,12 +5,12 @@ from cfg.config import *
 import logging
 import pandas as pd
 
-def cnt_drivers_labeled_ignore(drivers_df: pd.DataFrame):
+def print_cnt_drivers_labeled_ignore(drivers_df: pd.DataFrame):
     cnt_drivers_labeled_ignore = len(drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
     logging.info(f'{cnt_drivers_labeled_ignore} drivers labeled "ignore"')
 
 
-def cnt_riders_labeled_ignore(riders_df: pd.DataFrame):
+def print_cnt_riders_labeled_ignore(riders_df: pd.DataFrame):
     cnt_riders_labeled_ignore = len(riders_df[riders_df[RIDER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
     logging.info(f'{cnt_riders_labeled_ignore} riders labeled "ignore"')
 

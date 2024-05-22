@@ -3,7 +3,7 @@
 
 import cfg
 from cfg.config import *
-import lib.assignments as core
+import lib.feature as feat
 import lib.postprocessing as post
 import lib.rides_data as data
 import lib.validation as prep
@@ -45,13 +45,13 @@ def main(args: dict) -> None:
         return
 
     if ARGS[PARAM_ROTATE]:
-        prep.rotate_drivers(drivers)
+        feat.rotate_drivers(drivers)
 
     # Execute the assignment algorithm
     if args[PARAM_DAY] == ARG_FRIDAY:
-        out = core.assign_friday(drivers, riders)
+        out = feat.assign_friday(drivers, riders)
     else:
-        out = core.assign_sunday(drivers, riders)
+        out = feat.assign_sunday(drivers, riders)
     
     # Print output
     out = post.clean_output(out)
