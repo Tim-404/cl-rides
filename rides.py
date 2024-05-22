@@ -5,8 +5,8 @@ import cfg
 from cfg.config import *
 import lib.assignments as core
 import lib.postprocessing as post
-import lib.preprocessing as prep
 import lib.rides_data as data
+import lib.validation as prep
 import os
 import argparse
 import logging
@@ -47,8 +47,6 @@ def main(args: dict) -> None:
     if ARGS[PARAM_ROTATE]:
         prep.rotate_drivers(drivers)
 
-    prep.clean_data(drivers, riders)
-    
     # Execute the assignment algorithm
     if args[PARAM_DAY] == ARG_FRIDAY:
         out = core.assign_friday(drivers, riders)
