@@ -3,6 +3,7 @@
 
 from cfg.config import *
 import lib.rides_data as data
+import lib.stat as stat
 import logging
 import pandas as pd
 from sqlite3 import Timestamp
@@ -127,15 +128,6 @@ def create_rider_map(riders_df: pd.DataFrame):
     
     return rider_map
 
-def _cnt_drivers_labeled_ignore(drivers_df: pd.DataFrame):
-    cnt_drivers_labeled_ignore = len(drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
-    logging.info(f'{cnt_drivers_labeled_ignore} drivers labeled "ignore"')
-
-
-def _cnt_riders_labeled_ignore(riders_df: pd.DataFrame):
-    cnt_riders_labeled_ignore = len(riders_df[riders_df[RIDER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)].index)
-    logging.info(f'{cnt_riders_labeled_ignore} riders labeled "ignore"')
-
 
 def _ignore_drivers(drivers_df: pd.DataFrame):
     remove = drivers_df[drivers_df[DRIVER_NOTES_HDR].str.lower().str.contains(IGNORE_KEYWORD)]
@@ -157,7 +149,7 @@ def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
     """
 
     _mark_late_friday_riders(riders_df)
-    _cnt_riders_labeled_ignore(riders_df)
+    stat.cnt_riders_labeled_ignore(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_FRIDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
     num_riders = len(riders.index)
@@ -165,7 +157,7 @@ def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
     num_on_campus = num_riders - len(riders.index)
     logging.info(f"Skipping {num_on_campus} on-campus riders, they need rides from Peterson.")
 
-    _cnt_drivers_labeled_ignore(drivers_df)
+    stat.cnt_drivers_labeled_ignore(drivers_df)
     drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_FRIDAY_KEYWORD)]
     _ignore_drivers(drivers)
     return (drivers, riders)
@@ -204,11 +196,11 @@ def split_friday_late_cars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) ->
 def filter_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Filters riders that will attend Sunday service.
     """
-    _cnt_riders_labeled_ignore(riders_df)
+    stat.cnt_riders_labeled_ignore(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_SUNDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
     
-    _cnt_drivers_labeled_ignore(drivers_df)
+    stat.cnt_drivers_labeled_ignore(drivers_df)
     drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_SUNDAY_KEYWORD)]
     _ignore_drivers(drivers)
     return (drivers, riders)

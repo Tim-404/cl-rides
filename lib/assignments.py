@@ -5,7 +5,7 @@ Includes group optimization for common pickup locations.
 from cfg.config import *
 import lib.postprocessing as post
 import lib.setup as setup
-import lib.validation as prep
+import lib.stat as stat
 import logging
 import pandas as pd
 
@@ -259,8 +259,8 @@ def assign_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = organize(drivers1, riders1)
     assignments2 = organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
-    post.print_unassigned_riders(out)
-    post.print_unused_drivers(out, drivers)
+    stat.print_unassigned_riders(out)
+    stat.print_unused_drivers(out, drivers)
     return out
 
 
@@ -273,8 +273,8 @@ def assign_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = organize(drivers1, riders1)
     assignments2 = organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
-    post.print_unassigned_riders(out)
-    post.print_unused_drivers(out, drivers)
+    stat.print_unassigned_riders(out)
+    stat.print_unused_drivers(out, drivers)
     return out
 
 
