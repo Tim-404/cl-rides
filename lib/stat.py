@@ -18,7 +18,7 @@ def print_cnt_riders_labeled_ignore(riders_df: pd.DataFrame):
 def print_unassigned_riders(out: pd.DataFrame) -> None:
     for o_idx in out.index:
         if type(out.at[o_idx, OUTPUT_DRIVER_NAME_HDR]) is not str:
-            logging.warn(f'Rider not assigned: [{out.at[o_idx, RIDER_NAME_HDR]}]')
+            logging.warn(f'No driver for [{out.at[o_idx, RIDER_NAME_HDR]}]')
 
     # Count picked up riders
     cnt_riders_picked_up = 0

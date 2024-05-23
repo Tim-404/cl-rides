@@ -55,7 +55,6 @@ def main(args: dict) -> None:
     
     # Print output
     out = post.clean_output(out)
-    logging.debug(f'main --- Assignments output\n{out}')
 
     data.write_assignments(out, args[PARAM_UPLOAD])
 
