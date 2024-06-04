@@ -29,7 +29,6 @@ def clean_data(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
     """Filters out the unneeded columns and and validates the data before assigning.
     """
     _enforce_types(drivers_df, riders_df)
-    _remove_empty_rows(drivers_df, riders_df)
 
 
 def _enforce_types(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
