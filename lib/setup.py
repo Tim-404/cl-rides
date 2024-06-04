@@ -4,7 +4,6 @@
 from cfg.config import *
 import lib.rides_data as data
 import lib.trace as trace
-import lib.validation as prep
 import logging
 import pandas as pd
 from sqlite3 import Timestamp

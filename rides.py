@@ -8,6 +8,7 @@ import lib.custom_log as my_logger
 import lib.feature as feat
 import lib.postprocessing as post
 import lib.rides_data as data
+import lib.trace as trace
 import logging
 import os
 
@@ -21,9 +22,9 @@ def main() -> None:
     # Continue only if service_account.json exists for accessing the Google Sheets data
     api_reqs_fulfilled = os.path.exists(SERVICE_ACCT_FILE) or not (args[PARAM_DOWNLOAD] or args[PARAM_UPLOAD]) 
     if not api_reqs_fulfilled:
-        logging.critical(f'${SERVICE_ACCT_FILE} not found.')
-        logging.critical('Make sure service_account.json is in the cfg directory.')
-        logging.critical("Contact Timothy Wu if you don't have it.")
+        logging.critical(f'{os.path.basename(SERVICE_ACCT_FILE)} not found.')
+        logging.error(f'Make sure {os.path.basename(SERVICE_ACCT_FILE)} is in the cfg directory.')
+        logging.error("Contact Timothy Wu if you don't have it.")
         return
 
     cfg.init()
@@ -33,7 +34,7 @@ def main() -> None:
         data.update_pickles()
 
     # Print input
-    data.print_pickles()
+    trace.dbg_pickles()
     
     (drivers, riders) = data.get_cached_input()
 

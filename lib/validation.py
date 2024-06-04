@@ -43,8 +43,3 @@ def _enforce_types(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
 
     riders_df[RIDER_TIMESTAMP_HDR] = pd.to_datetime(riders_df[RIDER_TIMESTAMP_HDR])
     riders_df[RIDER_PHONE_HDR]     = riders_df[RIDER_PHONE_HDR].astype(str)
-
-
-def _remove_empty_rows(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
-    drivers_df.drop()
-    pass
