@@ -4,6 +4,7 @@
 from cfg.config import *
 import lib.rides_data as data
 import lib.trace as trace
+import lib.validation as prep
 import logging
 import pandas as pd
 from sqlite3 import Timestamp
@@ -135,6 +136,22 @@ def _ignore_riders(riders_df: pd.DataFrame):
     riders_df.drop(remove.index, inplace=True)
 
 
+def _drop_invalid(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
+    drivers_df.drop(drivers_df[ drivers_df[DRIVER_PHONE_HDR] == '' ].index, inplace=True)
+    drivers_df.drop_duplicates(subset=DRIVER_PHONE_HDR, inplace=True, keep='last')
+
+    riders_df_no_phone = riders_df[riders_df[RIDER_PHONE_HDR] == '']
+    trace.warn_rider_no_phone(riders_df_no_phone)
+    riders_df.drop(riders_df_no_phone.index, inplace=True)
+
+    riders_df.sort_values(by=RIDER_TIMESTAMP_HDR, inplace=True)
+    riders_df_dup_phone = riders_df[riders_df.duplicated([RIDER_PHONE_HDR], keep=False)]
+    trace.warn_rider_dup_phone(riders_df_dup_phone)
+    riders_df.drop_duplicates(subset=RIDER_PHONE_HDR, inplace=True, keep='last')
+    # keep the timestamp until we filter any outdated duplicates
+    riders_df.drop(columns=[RIDER_TIMESTAMP_HDR], inplace=True)
+
+
 ###########################################################################
 ###                             FRIDAY SETUP                            ###
 ###########################################################################
@@ -150,6 +167,9 @@ def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
     _mark_late_friday_riders(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_FRIDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
+
+    _drop_invalid(drivers, riders)
+
     num_riders = len(riders.index)
     riders = riders[~riders[RIDER_LOCATION_HDR].str.strip().str.lower().isin(CAMPUS_LOCS)]  # ~ negates isin(), removes campus ppl
     num_on_campus = num_riders - len(riders.index)
@@ -199,6 +219,9 @@ def filter_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
 
     riders = riders_df.copy()[riders_df[RIDER_SUNDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
+
+    _drop_invalid(drivers, riders)
+
     return (drivers, riders)
 
 
