@@ -3,10 +3,7 @@ Includes group optimization for common pickup locations.
 """
 
 from cfg.config import *
-import lib.postprocessing as post
 import lib.setup as setup
-import lib.trace as trace
-import logging
 import pandas as pd
 
 
