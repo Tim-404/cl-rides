@@ -30,21 +30,6 @@ def update_pickles():
             pickle.dump(records, pickle_file)
 
 
-def print_pickles():
-    """Print the riders and drivers in the pickle files.
-
-    There is no call to the Google Sheets API, so the printed data is from the last call to update_pickles.
-    """
-    with open(os.path.join(CFG_PATH, SHEET_IDS_FILE)) as gid_json:
-        keys = json.load(gid_json).keys()
-
-    for key in keys:
-        with open(os.path.join(DATA_PATH, key), 'rb') as pickle_file:
-            records = pickle.load(pickle_file)
-            df = pd.DataFrame(records)
-            logging.debug(f'print_pickles --- Printing {key}\n{df}')
-
-
 def get_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Return a tuple of pandas DataFrames, ordered as (permanent riders, weekly riders, drivers)
 

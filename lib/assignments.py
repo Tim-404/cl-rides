@@ -3,10 +3,7 @@ Includes group optimization for common pickup locations.
 """
 
 from cfg.config import *
-import lib.postprocessing as post
 import lib.setup as setup
-import lib.stat as stat
-import logging
 import pandas as pd
 
 
@@ -15,12 +12,6 @@ def assign(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataFrame:
     """
     riders_df.sort_values(by=RIDER_LOCATION_HDR, inplace=True, key=lambda col: col.apply(lambda loc: LOC_MAP.get(loc.strip().lower(), LOC_NONE)))
     out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_HDR, OUTPUT_DRIVER_PHONE_HDR, OUTPUT_DRIVER_CAPACITY_HDR, DRIVER_GROUP_HDR]), riders_df[[RIDER_NAME_HDR, RIDER_PHONE_HDR, RIDER_LOCATION_HDR, RIDER_NOTES_HDR]]], axis='columns')
-
-    logging.debug('assign --- Drivers')
-    logging.debug(drivers_df)
-    logging.debug('assign --- Riders')
-    logging.debug(riders_df)
-    logging.debug('assign --- Assigning started')
 
     # Assign drivers with preferences first
     for r_idx in out.index:
@@ -101,12 +92,6 @@ def assign_v2(drivers_df: pd.DataFrame, riders_df: pd.DataFrame, rider_map: dict
     """Assigns rider to drivers in the returned dataframe, uses a secondary map to help optimize assignments.
     """
     out = pd.concat([pd.DataFrame(columns=[OUTPUT_DRIVER_NAME_HDR, OUTPUT_DRIVER_PHONE_HDR, OUTPUT_DRIVER_CAPACITY_HDR, DRIVER_GROUP_HDR]), riders_df[[RIDER_NAME_HDR, RIDER_PHONE_HDR, RIDER_LOCATION_HDR, RIDER_NOTES_HDR]]], axis='columns')
-
-    logging.debug('assign_v2 --- Drivers')
-    logging.debug(drivers_df)
-    logging.debug('assign_v2 --- Riders')
-    logging.debug(riders_df)
-    logging.debug('assign_v2 --- Assigning started')
 
     # Assign drivers with preferences first
     for d_idx in drivers_df.index:

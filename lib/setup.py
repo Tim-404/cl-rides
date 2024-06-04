@@ -3,7 +3,7 @@
 
 from cfg.config import *
 import lib.rides_data as data
-import lib.stat as stat
+import lib.trace as trace
 import logging
 import pandas as pd
 from sqlite3 import Timestamp
@@ -67,11 +67,11 @@ def _mark_drivers_with_preferences(drivers_df: pd.DataFrame, riders_df: pd.DataF
 def fetch_necessary_drivers(drivers_df: pd.DataFrame, cnt_riders: int) -> pd.DataFrame:
     """Reduces the list of drivers to the minimum necessary to offer rides.
     """
-    logging.debug(f"fetch_necessary_drivers --- Drivers available:\n{drivers_df}")
+    trace.dbg_available_drivers(drivers_df)
     driver_cnt = _find_driver_cnt(drivers_df, cnt_riders)
     drivers = drivers_df.copy()[:driver_cnt]
     drivers.sort_values(by=DRIVER_CAPACITY_HDR, ascending=False, inplace=True)
-    logging.debug(f"fetch_necessary_drivers --- Drivers used:\n{drivers}")
+    trace.dbg_used_drivers(drivers_df)
     return drivers
 
 
@@ -102,7 +102,7 @@ def add_assignment_vars(drivers_df: pd.DataFrame):
         if loc != '' and loc in LOC_MAP:
             drivers_df.at[idx, TMP_DRIVER_PREF_LOC] = LOC_MAP.get(loc, LOC_NONE)
             cnt_pref += 1
-    logging.debug(f'add_assignment_vars --- Loaded {cnt_pref} driver location preferences')
+    logging.debug(f'Loaded {cnt_pref} driver location preferences')
 
 
 def create_rider_map(riders_df: pd.DataFrame):
@@ -135,14 +135,30 @@ def _ignore_riders(riders_df: pd.DataFrame):
     riders_df.drop(remove.index, inplace=True)
 
 
+def _drop_invalid(drivers_df: pd.DataFrame, riders_df: pd.DataFrame):
+    drivers_df.drop(drivers_df[ drivers_df[DRIVER_PHONE_HDR] == '' ].index, inplace=True)
+    drivers_df.drop_duplicates(subset=DRIVER_PHONE_HDR, inplace=True, keep='last')
+
+    riders_df_no_phone = riders_df[riders_df[RIDER_PHONE_HDR] == '']
+    trace.warn_rider_no_phone(riders_df_no_phone)
+    riders_df.drop(riders_df_no_phone.index, inplace=True)
+
+    riders_df.sort_values(by=RIDER_TIMESTAMP_HDR, inplace=True)
+    riders_df_dup_phone = riders_df[riders_df.duplicated([RIDER_PHONE_HDR], keep=False)]
+    trace.warn_rider_dup_phone(riders_df_dup_phone)
+    riders_df.drop_duplicates(subset=RIDER_PHONE_HDR, inplace=True, keep='last')
+    # keep the timestamp until we filter any outdated duplicates
+    riders_df.drop(columns=[RIDER_TIMESTAMP_HDR], inplace=True)
+
+
 ###########################################################################
 ###                             FRIDAY SETUP                            ###
 ###########################################################################
 def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Filters out riders who will get a ride from Peterson.
     """
-    stat.print_cnt_drivers_labeled_ignore(drivers_df)
-    stat.print_cnt_riders_labeled_ignore(riders_df)
+    trace.info_cnt_drivers_ignored(drivers_df)
+    trace.info_cnt_riders_ignored(riders_df)
 
     drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_FRIDAY_KEYWORD)]
     _ignore_drivers(drivers)
@@ -150,6 +166,9 @@ def filter_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd
     _mark_late_friday_riders(riders_df)
     riders = riders_df.copy()[riders_df[RIDER_FRIDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
+
+    _drop_invalid(drivers, riders)
+
     num_riders = len(riders.index)
     riders = riders[~riders[RIDER_LOCATION_HDR].str.strip().str.lower().isin(CAMPUS_LOCS)]  # ~ negates isin(), removes campus ppl
     num_on_campus = num_riders - len(riders.index)
@@ -191,14 +210,17 @@ def split_friday_late_cars(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) ->
 def filter_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Filters riders that will attend Sunday service.
     """
-    stat.print_cnt_drivers_labeled_ignore(drivers_df)
-    stat.print_cnt_riders_labeled_ignore(riders_df)
+    trace.info_cnt_drivers_ignored(drivers_df)
+    trace.info_cnt_riders_ignored(riders_df)
     
     drivers = drivers_df.copy()[drivers_df[DRIVER_AVAILABILITY_HDR].str.contains(DRIVER_SUNDAY_KEYWORD)]
     _ignore_drivers(drivers)
 
     riders = riders_df.copy()[riders_df[RIDER_SUNDAY_HDR] == RIDE_THERE_KEYWORD]
     _ignore_riders(riders)
+
+    _drop_invalid(drivers, riders)
+
     return (drivers, riders)
 
 

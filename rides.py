@@ -1,39 +1,40 @@
 """ Main file for automatic driver assignments.
 """
 
+import argparse
 import cfg
 from cfg.config import *
+import lib.custom_log as my_logger
 import lib.feature as feat
 import lib.postprocessing as post
 import lib.rides_data as data
-import lib.validation as prep
-import os
-import argparse
+import lib.trace as trace
 import logging
+import os
 
 
-def main(args: dict) -> None:
+def main() -> None:
     """ Assign riders to drivers, updating the sheet if specified
     """
 
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=getattr(logging, args[PARAM_LOG].upper()))
+    my_logger.init()
 
     # Continue only if service_account.json exists for accessing the Google Sheets data
     api_reqs_fulfilled = os.path.exists(SERVICE_ACCT_FILE) or not (args[PARAM_DOWNLOAD] or args[PARAM_UPLOAD]) 
     if not api_reqs_fulfilled:
-        logging.critical(f'${SERVICE_ACCT_FILE} not found.')
-        logging.critical('Make sure service_account.json is in the cfg directory.')
-        logging.critical("Contact Timothy Wu if you don't have it.")
+        logging.critical(f'{os.path.basename(SERVICE_ACCT_FILE)} not found.')
+        logging.error(f'Make sure {os.path.basename(SERVICE_ACCT_FILE)} is in the cfg directory.')
+        logging.error("Contact Timothy Wu if you don't have it.")
         return
 
-    cfg.load(args)
+    cfg.init()
 
     # Fetch data from sheets
-    if args[PARAM_DOWNLOAD]:
+    if ARGS[PARAM_DOWNLOAD]:
         data.update_pickles()
 
     # Print input
-    data.print_pickles()
+    trace.dbg_pickles()
     
     (drivers, riders) = data.get_cached_input()
 
@@ -48,16 +49,15 @@ def main(args: dict) -> None:
         feat.rotate_drivers(drivers)
 
     # Execute the assignment algorithm
-    if args[PARAM_DAY] == ARG_FRIDAY:
+    if ARGS[PARAM_DAY] == ARG_FRIDAY:
         out = feat.assign_friday(drivers, riders)
     else:
         out = feat.assign_sunday(drivers, riders)
     
     # Print output
     out = post.clean_output(out)
-    logging.debug(f'main --- Assignments output\n{out}')
 
-    data.write_assignments(out, args[PARAM_UPLOAD])
+    data.write_assignments(out, ARGS[PARAM_UPLOAD])
 
 
 if __name__ == '__main__':
@@ -79,9 +79,9 @@ if __name__ == '__main__':
                         help='set how many far a driver can be to pick up at a neighboring location before choosing a last resort driver')
     parser.add_argument(f'--{PARAM_GROUP_SZ}', type=int, default=1, choices=range(1, ARG_GROUP_SZ_MAX + 1),
                         help='set how many riders must be leftover at a location for a driver to pick up from there')
-    parser.add_argument(f'--{PARAM_LOG}', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'],
+    parser.add_argument(f'--{PARAM_LOG}', type=str.upper, default='INFO', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help='set a level of verbosity for logging')
     
     args = vars(parser.parse_args())
-
-    main(args);
+    ARGS.update(args)
+    main()

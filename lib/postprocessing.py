@@ -2,7 +2,6 @@
 """
 
 from cfg.config import *
-import logging
 import numpy as np
 import pandas as pd
 
@@ -68,7 +67,6 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
             # No driver assigned
             out.at[old_idx, OUTPUT_DRIVER_NAME_HDR] = '?'
             out.at[old_idx, OUTPUT_DRIVER_CAPACITY_HDR] = '?'
-            logging.debug(f'_format_output --- {out.at[old_idx, RIDER_NAME_HDR]} has no driver')
         elif not is_next_driver:
             # Remove redundant driver details.
             out.at[old_idx, OUTPUT_DRIVER_NAME_HDR] = ''

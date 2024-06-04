@@ -5,7 +5,7 @@ from cfg.config import *
 import lib.assignments as core
 import lib.rides_data as data
 import lib.setup as setup
-import lib.stat as stat
+import lib.trace as trace
 import pandas as pd
 
 
@@ -24,8 +24,8 @@ def assign_sunday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = core.organize(drivers1, riders1)
     assignments2 = core.organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
-    stat.print_unassigned_riders(out)
-    stat.print_unused_drivers(out, drivers)
+    trace.info_unassigned_riders(out)
+    trace.info_unused_drivers(out, drivers)
     return out
 
 
@@ -38,6 +38,6 @@ def assign_friday(drivers_df: pd.DataFrame, riders_df: pd.DataFrame) -> pd.DataF
     assignments1 = core.organize(drivers1, riders1)
     assignments2 = core.organize(drivers2, riders2)
     out = pd.concat([assignments1, assignments2])
-    stat.print_unassigned_riders(out)
-    stat.print_unused_drivers(out, drivers)
+    trace.info_unassigned_riders(out)
+    trace.info_unused_drivers(out, drivers)
     return out
