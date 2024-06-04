@@ -16,15 +16,28 @@ def info_cnt_riders_ignored(riders_df: pd.DataFrame):
     logging.info(f'{cnt_riders_labeled_ignore} riders labeled "ignore"')
 
 
+def warn_rider_no_phone(riders_df_no_phone: pd.DataFrame):
+    if len(riders_df_no_phone.index) > 0 and logging.getLevelName(ARGS[PARAM_LOG]) <= logging.WARN:
+        logging.warn('Riders missing phone numbers:')
+        print(riders_df_no_phone[[RIDER_NAME_HDR]])
+
+
+def warn_rider_dup_phone(riders_df_dup_phone: pd.DataFrame):
+    if len(riders_df_dup_phone.index) > 0 and logging.getLevelName(ARGS[PARAM_LOG]) <= logging.WARN:
+        logging.warn('Riders sharing phone numbers, keeping last:')
+        print(riders_df_dup_phone[[RIDER_NAME_HDR, RIDER_PHONE_HDR]])
+
+
+
 def dbg_available_drivers(drivers_df: pd.DataFrame):
     if logging.getLevelName(ARGS[PARAM_LOG]) <= logging.DEBUG:
-        logging.debug(f"Drivers available:")
+        logging.debug("Drivers available:")
         print(drivers_df[[DRIVER_NAME_HDR, DRIVER_PHONE_HDR, DRIVER_OPENINGS_HDR]])
     
 
 def dbg_used_drivers(drivers_df: pd.DataFrame):
     if logging.getLevelName(ARGS[PARAM_LOG]) <= logging.DEBUG:
-        logging.debug(f"Drivers used:")
+        logging.debug("Drivers used:")
         print(drivers_df[[DRIVER_NAME_HDR, DRIVER_PHONE_HDR]])
 
 
