@@ -76,7 +76,6 @@ def _format_output(out: pd.DataFrame) -> pd.DataFrame:
         _copy_output_row(new_out, out, new_idx, old_idx)
         new_idx += 1
     
-    logging.debug(f'_format_output --- Assignments output\n{new_out}')
     return new_out
 
         

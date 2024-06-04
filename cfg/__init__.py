@@ -57,7 +57,6 @@ def create_pickles():
         pd.DataFrame().to_pickle(os.path.join(DATA_PATH, OUTPUT_SHEET_KEY))
 
 
-def load(args: dict):
-    ARGS.update(args)
+def init():
     load_map()
     create_pickles()
